@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+env/
+conda/
+.conda/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Large model artifacts
+models/
+checkpoints/
+artifacts/models/
+*.onnx
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.gguf
+*.engine
+
+# Temporary files
+tmp/
+temp/
+.tmp_test_runs/
+*.tmp
+.test/
+
+# Local tool bundles
+mlperf-client-1.5.0-8665cb1-windows-x64/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
