@@ -3,7 +3,7 @@
 ## Why this repo
 - Goal: Provide reproducible benchmarking and profiling for on-device AI workloads such as LLMs and CNNs.
 - Focus: Start with AMD Ryzen AI (NPU/iGPU/CPU) reference workflows, then expand into deeper optimization techniques. GPU-focused workflows are planned for later.
-- Approach: Pair benchmark results with clear explanations and "why"-focused code to help beginners and practitioners understand performance behavior.
+- Approach: Pair benchmark results with clear explanations and "why" focused code to help beginners and practitioners understand performance behavior.
 
 ## Getting Started
 1. Read `docs/00_setup.md`
