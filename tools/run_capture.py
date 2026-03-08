@@ -87,11 +87,6 @@ def main() -> int:
         help="Root folder for raw run artifacts. Default: results/raw",
     )
     parser.add_argument(
-        "--force",
-        action="store_true",
-        help="Deprecated compatibility flag. Captures now append to existing artifacts.",
-    )
-    parser.add_argument(
         "command",
         nargs=argparse.REMAINDER,
         help="Command to execute. Use '--' before command arguments.",
