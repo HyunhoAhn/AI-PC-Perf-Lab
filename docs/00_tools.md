@@ -31,7 +31,7 @@ python tools/run_capture.py --run-id $runId -- python -c "import onnxruntime as 
 It will generate the following files:
    - `results/raw/<run_id>/stdout.log`
    - `results/raw/<run_id>/stderr.log`
-   - `results/raw/<run_id>/metadata.json`   
+   - `results/raw/<run_id>/metadata.jsonl`   
 
-The `metadata.json` will include the command, start/end timestamps, and environment metadata reference.
+The `metadata.jsonl` will include the command, start/end timestamps, and environment metadata reference.
 The stdout and stderr logs will capture the respective outputs of the command execution.
