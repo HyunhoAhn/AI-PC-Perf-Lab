@@ -163,23 +163,12 @@ def main() -> int:
         default="results/raw",
         help="Root folder for raw run artifacts. Default: results/raw",
     )
-    parser.add_argument(
-        "--force",
-        action="store_true",
-        help="Overwrite env files if they already exist for this run_id.",
-    )
     args = parser.parse_args()
 
     run_dir = Path(args.results_root) / args.run_id
     run_dir.mkdir(parents=True, exist_ok=True)
 
-    env_json_path = run_dir / "env.json"
-    env_txt_path = run_dir / "env.txt"
-    if not args.force and (env_json_path.exists() or env_txt_path.exists()):
-        raise SystemExit(
-            f"Refusing to overwrite existing env snapshot for run_id '{args.run_id}'. "
-            "Use --force if overwrite is intentional."
-        )
+    env_history_path = run_dir / "env_history.jsonl"
 
     pip_rc, pip_stdout, pip_stderr = _run_text([sys.executable, "-m", "pip", "freeze"])
     pip_stdout = pip_stdout or ""
@@ -244,11 +233,11 @@ def main() -> int:
     if pip_rc != 0:
         payload["pip_freeze_stderr"] = pip_stderr.strip()
 
-    env_json_path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
-    #env_txt_path.write_text(_as_text(payload, pip_stdout), encoding="utf-8")
+    with env_history_path.open("a", encoding="utf-8", newline="\n") as handle:
+        handle.write(json.dumps(payload, sort_keys=True))
+        handle.write("\n")
 
-    print(f"Saved environment snapshot to: {env_json_path}")
-    #print(f"Saved text snapshot to: {env_txt_path}")
+    print(f"Appended environment snapshot to: {env_history_path}")
     return 0
 
 
