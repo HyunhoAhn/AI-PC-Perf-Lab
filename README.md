@@ -6,12 +6,13 @@
 - Approach: Pair benchmark results with clear explanations and "why" focused code to help beginners and practitioners understand performance behavior.
 
 ## Getting Started
-1. Read `docs/00_setup.md`
-2. Run the CNN smoke test: `docs/cnn_smoke_test.md`
-3. Run LLM reference benchmarks: WIP
-4. Profiling playbook: WIP
-5. Quantization deep dive: WIP
-6. GPU kernel deep dive (optional): WIP
+1. Read `docs/00_setup.md` for environment setup and repo walkthrough.
+2. Read `docs/00_tools.md` to understand the tools for environment capture and command execution capture.
+3. Run the CNN smoke test: `docs/cnn_smoke_test.md`
+4. Run LLM reference benchmarks: WIP
+5. Profiling playbook: WIP
+6. Quantization deep dive: WIP
+7. GPU kernel deep dive (optional): WIP
 
 ## Repo structure
 - `docs/`: setup, methodology, benchmark plans, and profiling playbooks

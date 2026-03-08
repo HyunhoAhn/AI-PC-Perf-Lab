@@ -26,6 +26,42 @@ def _sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _append_log_marker(
+    handle,
+    *,
+    timestamp: str,
+    command_str: str,
+    prepend_newline: bool,
+) -> None:
+    lines = []
+    if prepend_newline:
+        lines.append("")
+    lines.append("===== run_capture start =====")
+    lines.append(f"timestamp_utc={timestamp}")
+    lines.append(f"command={command_str}")
+    lines.append("")
+    marker = "\n".join(lines).encode("utf-8", errors="replace")
+    handle.write(marker)
+    handle.flush()
+
+
+def _migrate_legacy_metadata(metadata_path: Path, metadata_jsonl_path: Path) -> None:
+    if not metadata_path.exists() or metadata_jsonl_path.exists():
+        return
+
+    try:
+        legacy_payload = json.loads(metadata_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return
+
+    if not isinstance(legacy_payload, dict):
+        return
+
+    with metadata_jsonl_path.open("a", encoding="utf-8", newline="\n") as handle:
+        handle.write(json.dumps(legacy_payload, sort_keys=True))
+        handle.write("\n")
+
+
 def _read_manifest_mode(run_dir: Path) -> str:
     manifest_path = run_dir / "manifest.yml"
     if not manifest_path.exists():
@@ -53,7 +89,7 @@ def main() -> int:
     parser.add_argument(
         "--force",
         action="store_true",
-        help="Overwrite stdout/stderr/metadata files if they exist.",
+        help="Deprecated compatibility flag. Captures now append to existing artifacts.",
     )
     parser.add_argument(
         "command",
@@ -74,17 +110,31 @@ def main() -> int:
     stdout_path = run_dir / "stdout.log"
     stderr_path = run_dir / "stderr.log"
     metadata_path = run_dir / "metadata.json"
-    existing = [p for p in (stdout_path, stderr_path, metadata_path) if p.exists()]
-    if existing and not args.force:
-        existing_str = ", ".join(str(p) for p in existing)
-        raise SystemExit(
-            "Refusing to overwrite existing raw artifacts: "
-            f"{existing_str}. Use --force if overwrite is intentional."
-        )
+    metadata_jsonl_path = run_dir / "metadata.jsonl"
+    _migrate_legacy_metadata(metadata_path, metadata_jsonl_path)
 
     started_at = _iso_now()
     start_monotonic = time.monotonic()
-    with stdout_path.open("wb") as out_file, stderr_path.open("wb") as err_file:
+    command_str = subprocess.list2cmdline(command)
+    stdout_prepend_newline = stdout_path.exists() and stdout_path.stat().st_size > 0
+    stderr_prepend_newline = stderr_path.exists() and stderr_path.stat().st_size > 0
+    stdout_bytes_before = stdout_path.stat().st_size if stdout_path.exists() else 0
+    stderr_bytes_before = stderr_path.stat().st_size if stderr_path.exists() else 0
+
+    with stdout_path.open("ab") as out_file, stderr_path.open("ab") as err_file:
+        _append_log_marker(
+            out_file,
+            timestamp=started_at,
+            command_str=command_str,
+            prepend_newline=stdout_prepend_newline,
+        )
+        _append_log_marker(
+            err_file,
+            timestamp=started_at,
+            command_str=command_str,
+            prepend_newline=stderr_prepend_newline,
+        )
+
         proc = subprocess.Popen(
             command,
             stdout=out_file,
@@ -92,11 +142,11 @@ def main() -> int:
             shell=False,
         )
         return_code = proc.wait()
-    finished_at = _iso_now()
+        finished_at = _iso_now()
+
     duration_sec = round(time.monotonic() - start_monotonic, 6)
     stdout_sha256 = _sha256_file(stdout_path)
     stderr_sha256 = _sha256_file(stderr_path)
-    command_str = subprocess.list2cmdline(command)
     command_sha256 = hashlib.sha256(command_str.encode("utf-8")).hexdigest()
 
     metadata = {
@@ -116,16 +166,21 @@ def main() -> int:
         "exit_code": return_code,
         "stdout_sha256": stdout_sha256,
         "stderr_sha256": stderr_sha256,
+        "stdout_bytes_before": stdout_bytes_before,
         "stdout_bytes": stdout_path.stat().st_size,
+        "stderr_bytes_before": stderr_bytes_before,
         "stderr_bytes": stderr_path.stat().st_size,
         "stdout_log": str(stdout_path.as_posix()),
         "stderr_log": str(stderr_path.as_posix()),
     }
-    metadata_path.write_text(json.dumps(metadata, indent=2, sort_keys=True), encoding="utf-8")
+
+    with metadata_jsonl_path.open("a", encoding="utf-8", newline="\n") as handle:
+        handle.write(json.dumps(metadata, sort_keys=True))
+        handle.write("\n")
 
     print(f"Captured stdout: {stdout_path}")
     print(f"Captured stderr: {stderr_path}")
-    print(f"Wrote metadata: {metadata_path}")
+    print(f"Appended metadata: {metadata_jsonl_path}")
     print(f"Command exit code: {return_code}")
     return return_code
 
