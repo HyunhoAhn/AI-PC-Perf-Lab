@@ -10,7 +10,7 @@ python -c "import onnxruntime as ort; print('onnxruntime=' + ort.__version__); p
 
 ## Tools in ./tools 
 
-*Notes: $runID is unique folder name for storing your results at ../results/raw
+*Note: $runID is unique folder name for storing your results at ../results/raw*
 
 
 ### Capture environment:
