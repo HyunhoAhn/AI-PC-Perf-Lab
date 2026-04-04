@@ -20,18 +20,18 @@ This document records the machine-specific setup state, runtime versions, verifi
 - Windows version (build): Windows-11-10.0.26200-SP0
 - AMD chipset Software: 7.11.26.2142
 - AMD graphics driver: 32.0.23017.1001
-- NPU driver / Ryzen AI Software version: 32.0.203.329/Ryzen AI 1.7.0 
-- Last verified date (UTC): 2026-03-06
+- NPU driver / Ryzen AI Software version: 32.0.203.329/Ryzen AI 1.7.1 
+- Last verified date (UTC): 2026-04-04
 
 ### 3. Runtime and Tooling Versions
 
-- Conda environment: ryzenai170
+- Conda environment: ryzenai171
 - Python version: 3.12.11 (conda-forge build)
-- onnxruntime version: 1.23.2.dev20260117; pip package variant includes onnxruntime-vitisai wheel
+- onnxruntime version: 1.23.3.dev20260320; pip package variant includes onnxruntime-vitisai wheel
 - onnxruntime-genai version: 0.11.2 package family (onnxruntime-genai-directml-ryzenai)
 - MLPerf Client version: mlperf-client-1.5.0-8665cb1-windows-x64
 - Lemonade version: lemonade-server version 9.4.1
-- Ai Analyzer: 1.7.0
+- Ai Analyzer: 1.7.1
 - amd-quark: 0.11rc1
 
 ### 4. Setup guidance
@@ -129,32 +129,20 @@ XRT
 - `xrt-smi validate` summary: 
 ```
 Verbose: Enabling Verbosity
-Validate Device           : [xx:xx:xx]
+Validate Device           : [xx:xx:xx.xx]
     Platform              : NPU Strix Halo
     Power Mode            : Performance
 -------------------------------------------------------------------------------
 Test 1 [00c3:00:01.1]     : gemm
-    Description           : Measure the TOPS value of GEMM operations
-    Details               : Using DPU Sequence
-                            Total Duration: 122.7 ns
-                            Average cycle count: 222.0
-                            TOPS: 51.3
+    Details               : TOPS: 51.3
     Test Status           : [PASSED]
 -------------------------------------------------------------------------------
 Test 2 [00c3:00:01.1]     : latency
-    Description           : Run end-to-end latency test
-    Details               : Using DPU Sequence
-                            Instruction size: 20 bytes
-                            No. of iterations: 10000
-                            Average latency: 63.2 us
+    Details               : Average latency: 78.0 us
     Test Status           : [PASSED]
 -------------------------------------------------------------------------------
 Test 3 [00c3:00:01.1]     : throughput
-    Description           : Run end-to-end throughput test
-    Details               : Using DPU Sequence
-                            Instruction size: 20 bytes
-                            No. of iterations: 2502
-                            Average throughput: 55532.7 ops
+    Details               : Average throughput: 57152.4 ops
     Test Status           : [PASSED]
 -------------------------------------------------------------------------------
 ```
