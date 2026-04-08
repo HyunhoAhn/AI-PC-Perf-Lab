@@ -51,6 +51,9 @@ class RunConfig:
     warmup: int
     profile_out: Path | None
     requires_custom_ops: bool
+    vaip_cache_dir: Path | None
+    vaip_cache_key: str | None
+    clear_vaip_cache: bool
 
 
 def parse_args() -> argparse.Namespace:
@@ -80,6 +83,21 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Write ONNX Runtime profiling JSON to this path.",
     )
+    parser.add_argument(
+        "--vaip-cache-dir",
+        default=None,
+        help="NPU only. Directory used for Vitis AI EP cache.",
+    )
+    parser.add_argument(
+        "--vaip-cache-key",
+        default=None,
+        help="NPU only. Cache subfolder key inside --vaip-cache-dir.",
+    )
+    parser.add_argument(
+        "--clear-vaip-cache",
+        action="store_true",
+        help="NPU only. Clear only the requested VAIP cache-key subfolder before creating the session.",
+    )
     '''
     parser.add_argument(
         "--precision",
@@ -101,6 +119,25 @@ def build_config(args: argparse.Namespace) -> RunConfig:
     if not model_path.exists():
         raise SystemExit(f"Model file not found: {model_path}")
 
+    vaip_options_used = any(
+        (
+            args.vaip_cache_dir,
+            args.vaip_cache_key,
+            args.clear_vaip_cache,
+        )
+    )
+    if args.device != "npu" and vaip_options_used:
+        raise SystemExit(
+            "--vaip-cache-dir, --vaip-cache-key, and --clear-vaip-cache "
+            "can only be used with --device npu."
+        )
+
+    vaip_cache_dir = Path(args.vaip_cache_dir) if args.vaip_cache_dir else None
+    if args.clear_vaip_cache and vaip_cache_dir is None:
+        raise SystemExit("--clear-vaip-cache requires --vaip-cache-dir.")
+    if args.clear_vaip_cache and not args.vaip_cache_key:
+        raise SystemExit("--clear-vaip-cache requires --vaip-cache-key.")
+
     return RunConfig(
         model_path=model_path,
         #precision=args.precision,
@@ -113,6 +150,9 @@ def build_config(args: argparse.Namespace) -> RunConfig:
         warmup=args.warmup,
         profile_out=Path(args.profile_out) if args.profile_out else None,
         requires_custom_ops=model_requires_custom_ops(model_path),
+        vaip_cache_dir=vaip_cache_dir,
+        vaip_cache_key=args.vaip_cache_key,
+        clear_vaip_cache=args.clear_vaip_cache,
     )
 
 
@@ -144,9 +184,40 @@ def ensure_parent_path(path: Path | None) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
 
 
+def ensure_directory_path(path: Path | None) -> None:
+    if path is None:
+        return
+    path.mkdir(parents=True, exist_ok=True)
+
+
 def print_json_line(prefix: str, payload: dict[str, Any]) -> None:
     print(f"{prefix}=" + json.dumps(payload, sort_keys=True))
 
+def clear_vaip_cache_if_requested(config: RunConfig) -> None:
+    if not config.clear_vaip_cache:
+        return
+
+    if config.vaip_cache_dir is None or not config.vaip_cache_key:
+        return
+
+    cache_path = config.vaip_cache_dir / config.vaip_cache_key
+    if cache_path.exists():
+        shutil.rmtree(cache_path)
+
+
+def build_provider_options(config: RunConfig) -> list[dict[str, str]] | None:
+    if config.device != "npu":
+        return None
+
+    provider_options: dict[str, str] = {}
+    if config.vaip_cache_dir is not None:
+        provider_options["cache_dir"] = str(config.vaip_cache_dir.resolve())
+    if config.vaip_cache_key:
+        provider_options["cache_key"] = config.vaip_cache_key
+
+    if not provider_options:
+        return None
+    return [provider_options]
 
 def model_requires_custom_ops(model_path: Path) -> bool:
     model = onnx.load(str(model_path), load_external_data=False)
@@ -246,13 +317,13 @@ def build_inputs(
 
 def create_session(config: RunConfig) -> tuple[ort.InferenceSession, bool]:
     session_options = ort.SessionOptions()
-    
+
     if config.disable_fallback:
         session_options.add_session_config_entry(
-        "session.disable_cpu_ep_fallback", 
-        "1"
-    )
-    
+            "session.disable_cpu_ep_fallback",
+            "1",
+        )
+
     if config.profile_out is not None:
         session_options.enable_profiling = True
 
@@ -260,10 +331,15 @@ def create_session(config: RunConfig) -> tuple[ort.InferenceSession, bool]:
         session_options,
         config.requires_custom_ops,
     )
+    if config.device == "npu" and config.vaip_cache_dir is not None:
+        ensure_directory_path(config.vaip_cache_dir)
+    clear_vaip_cache_if_requested(config)
+
     session = ort.InferenceSession(
         str(config.model_path),
         sess_options=session_options,
         providers=[config.provider],
+        provider_options=build_provider_options(config),
     )
 
     if config.disable_fallback:
@@ -330,6 +406,9 @@ def build_config_summary(config: RunConfig, custom_ops_registered: bool) -> dict
         "provider": config.provider,
         "repeat": config.repeat,
         "requires_custom_ops": config.requires_custom_ops,
+        "vaip_cache_dir": str(config.vaip_cache_dir) if config.vaip_cache_dir else None,
+        "vaip_cache_key": config.vaip_cache_key,
+        "clear_vaip_cache": config.clear_vaip_cache,
         "warmup": config.warmup,
     }
 
