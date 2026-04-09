@@ -210,6 +210,8 @@ def build_provider_options(config: RunConfig) -> list[dict[str, str]] | None:
         return None
 
     provider_options: dict[str, str] = {}
+    if config.vaip_cache_dir is not None or config.vaip_cache_key:
+        provider_options["enable_cache_file_io_in_mem"] = "0"
     if config.vaip_cache_dir is not None:
         provider_options["cache_dir"] = str(config.vaip_cache_dir.resolve())
     if config.vaip_cache_key:
