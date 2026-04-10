@@ -62,6 +62,7 @@ function Invoke-CnnSmokeCase {
     Write-Host ""
     Write-Host "===== $runId :: $ModelPath :: $Device :: $VariantName ====="
 
+    $modelName = [System.IO.Path]::GetFileNameWithoutExtension($ModelPath)
     $command = @(
         $smokeScript
         "--model-path", $ModelPath
@@ -74,6 +75,14 @@ function Invoke-CnnSmokeCase {
 
     if ($EnableProfile) {
         $command += @("--profile-out", "results/raw/$runId")
+    }
+
+    if ($Device -eq "npu") {
+        $command += @(
+            "--vaip-cache-dir", "results/raw/$runId"
+            "--vaip-cache-key", $modelName
+            "--clear-vaip-cache"
+        )
     }
 
     & $pythonExe "tools/run_capture.py" --run-id $runId -- $pythonExe @command
