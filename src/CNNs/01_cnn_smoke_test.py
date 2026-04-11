@@ -73,7 +73,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--input-shape",
         default="3x224x224",
-        help="Input tensor shape excluding batch. Format: 3x224x224",
+        help="Input tensor shape excluding batch. Format: 3x224x224 for CHW, 224x224x3 for HWC. Batch dimension is added automatically based on --batch. "
     )
     parser.add_argument("--batch", type=int, default=1, help="Batch size override.")
     parser.add_argument("--repeat", type=int, default=30, help="Timed iterations.")
