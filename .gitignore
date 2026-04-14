@@ -41,6 +41,7 @@ temp/
 .tmp_test_runs/
 *.tmp
 .test/
+results/old
 
 # Local tool bundles
 mlperf-client-1.5.0-8665cb1-windows-x64/
