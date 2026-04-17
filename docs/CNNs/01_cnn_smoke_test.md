@@ -8,7 +8,7 @@ This document describes the CNN smoke test we run before scaling up the evaluati
 
 ## Preconditions
 
-0. Check the `00_setup.md` and `00_tools.md` documents for required setup steps and tools.
+0. Check the `00_setup.md` and `01_tools.md` documents for required setup steps and tools.
 1. The Windows environment is ready (`conda activate ryzenai171`), and the Ryzen AI SDK is installed.
 2. The following ORT providers are available:
    - `VitisAIExecutionProvider`

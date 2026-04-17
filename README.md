@@ -7,7 +7,7 @@
 
 ## Getting Started
 1. Read `docs/00_setup.md` for environment setup and repo walkthrough.
-2. Read `docs/00_tools.md` to understand the tools for environment capture and command execution capture.
+2. Read `docs/01_tools.md` to understand the tools for environment capture and command execution capture.
 3. Read `docs/cnn` for CNN-specific documentation. It includes a smoke test with ResNet50 across different precisions and devices, along with performance and power profiling. It gives a great starting point for understanding the workflows before we move into LLMs.
 4. Run LLM reference benchmarks: WIP
 5. Profiling playbook: WIP
