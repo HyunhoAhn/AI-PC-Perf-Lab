@@ -1,4 +1,4 @@
-# AI PC Performance Lab (Ryzen AI / NVIDA GPU)
+# AI PC Performance Lab (Ryzen AI / NVIDIA GPU)
 
 ## Why this repo
 - Goal: Provide reproducible benchmarking and profiling for on-device AI workloads such as LLMs and CNNs.
