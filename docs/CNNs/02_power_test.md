@@ -17,21 +17,20 @@ This is not a rail-level electrical measurement. A stricter study would require 
 
 ## Preconditions
 
-0. Review `docs/00_setup.md`, `docs/01_tools.md`, and `docs/02_profiling_tools.md`.
+0. Review `docs/00_setup.md`, `docs/01_tools.md`, `docs/02_profiling_tools.md`, and `docs\CNNs\01_cnn_smoke_test.md`.
 1. The Windows environment is ready and the required ONNX Runtime execution providers are available.
 2. `models/resnet50.onnx` and any derived model variants needed for the test already exist.
 3. External monitoring tools are installed and validated:
-   - `AMD uProf`
-   - `HWiNFO64`
-   - `xrt-smi`
+   - `AMD uProf` : 5.2.431, C:\Program Files\AMD\AMDuProf\bin\AMDuProfCLI.exe
+   - `xrt-smi` : 1.7.1 (Ryzena AI), C:\Windows\System32\AMD\xrt-smi.exe
 
 ## Tool Roles
 
 - `AMD uProf`: primary CPU-side monitor for core-level and package-level counters.
-- `HWiNFO64`: supplemental sensor source for package power, temperature, clocks, fan speed, and board-level telemetry when the platform exposes those sensors.
 - `xrt-smi`: estimated NPU power and NPU state.
+- `HWiNFO64`: supplemental sensor source for package power, temperature, clocks, fan speed, and board-level telemetry when the platform exposes those sensors. You can use its CPU Package Power for APU, but I will not use it for this test because it requires a Pro license to export logs via CLI, and I want to keep the workflow fully accessible without additional purchases. 
 
-Package-level telemetry should be treated as a proxy. It is useful for comparison, but it should not be interpreted as a fully isolated iGPU or NPU power measurement unless the platform documentation confirms that attribution.
+This power test relies on software-visible telemetry as a proxy for power. This is not a direct electrical measurement, but it can still be useful for comparing relative differences between devices under the same workload. Again, Package-level telemetry should be treated as a proxy. It is useful for comparison, but it should not be interpreted as a fully CPU+NPU+iGPU power measurement before, documents confirms it.
 
 ## Test Design
 
@@ -50,8 +49,12 @@ The current plan is to run the same ONNX Runtime inference workload across devic
 ### 1. Capture environment metadata
 
 ```powershell
-$runId = "02_power_test"
+$runId = "cnn_power_test"
 python tools/capture_env.py --run-id $runId
+```
+
+```powershell
+& .\tools\02_cnn_power_test.ps1
 ```
 
 ### 2. Start external monitors
@@ -82,19 +85,19 @@ The repeat count is expected to be tuned. The main requirement is that the run d
 
 - Use `AMD uProf` as the primary source for CPU power.
 - Collect both core-level and package-level counters when available.
-- Use `HWiNFO64` as a supplemental source for package power, temperature, clock, and fan data.
+- Use `HWiNFO64` as a supplemental source for package power.
 
 ### NPU
 
 - Use `xrt-smi` for estimated NPU power.
 - Use `AMD uProf` package-level counters as a supplemental system-level proxy.
-- Use `HWiNFO64` as a supplemental telemetry source.
+- Use `HWiNFO64` as a supplemental source for package power.
 - Reuse the model cache before measured runs so that compilation and first-run effects do not dominate the results.
 
 ### iGPU
 
 - Use `AMD uProf` package-level counters as a supplemental proxy.
-- Use `HWiNFO64` as a supplemental telemetry source.
+- Use `HWiNFO64` as a supplemental source for package power.
 
 ## Planned Outputs
 

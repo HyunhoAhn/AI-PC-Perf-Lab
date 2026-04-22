@@ -67,7 +67,7 @@ It is useful for validating NPU state, monitoring partition-level activity, and 
 
 Homepage: https://hwinfo64.com/
 
-HWiNFO64 is a supplemental Windows sensor monitor. It is useful when the platform exposes additional telemetry such as package power, temperatures, clocks, fan speeds, or board-level sensors that are not available from `xrt-smi`.
+HWiNFO64 is a supplemental Windows sensor monitor. It is useful when the platform exposes additional telemetry such as package power, temperatures, clocks, fan speeds, or board-level sensors. However, to records the results using CLI, it requires a Pro version license. If not, you need to manually export the sensor logs from the HWiNFO64 GUI.
 
 Use it as an auxiliary data source only:
 

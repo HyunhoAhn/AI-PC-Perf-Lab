@@ -134,6 +134,7 @@ def main() -> int:
             command,
             stdout=out_file,
             stderr=err_file,
+            stdin=subprocess.DEVNULL,
             shell=False,
         )
         return_code = proc.wait()
