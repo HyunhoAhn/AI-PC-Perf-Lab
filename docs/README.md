@@ -16,8 +16,7 @@ This folder contains the working documentation for the AI PC performance lab. It
 This folder contains CNN-specific test plans, observations, and precision notes.
 
 - `01_cnn_smoke_test.md`: End-to-end CNN smoke test procedure for ResNet50 across CPU, iGPU, and NPU, including model preparation, execution steps, and observed results.
-- `02_power_test.md`: Draft power test procedure for comparing latency and software-visible power telemetry across CPU, iGPU, and NPU.
-- `BF16.md`: Notes and early commands related to BF16 model handling and BF16 conversion experiments.
+- `02_power_test.md`: power test procedure for comparing latency and software-visible power telemetry across CPU, iGPU, and NPU.
 
 ### `LLMs`
 
