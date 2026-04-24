@@ -41,6 +41,7 @@ temp/
 .tmp_test_runs/
 *.tmp
 .test/
+results/raw/
 results/old
 
 # Local tool bundles
