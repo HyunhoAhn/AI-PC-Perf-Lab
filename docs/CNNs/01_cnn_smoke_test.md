@@ -1,4 +1,4 @@
-# 10 CNN Smoke Test
+# 01 CNN Smoke Test
 
 ## Concept Primer
 This document describes the CNN smoke test we run before scaling up the evaluation. The goal is to validate our end-to-end capture and parsing workflows on a known workload with expected performance characteristics. We run a small matrix of ResNet50 inference tests across FP32, FP16, and INT8 precisions on the NPU, iGPU, and CPU, capturing latency and profiling data with ONNX Runtime and Ryzen AI SDK tools.
