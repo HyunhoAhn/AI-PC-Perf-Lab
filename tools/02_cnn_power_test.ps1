@@ -10,7 +10,7 @@ param(
     [string[]]$Cases = @(),
     [string]$PythonExe = "python",
     [string]$SharedVaipCacheDir = "results/raw/cnn_power_test",
-    [switch]$SkipCaptureEnv,
+    [switch]$SkipCaptureEnv
 )
 
 $ErrorActionPreference = "Stop"

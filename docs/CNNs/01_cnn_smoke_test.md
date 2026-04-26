@@ -138,13 +138,7 @@ This confirms that FP16 is not supported and that the FP32 model runs as BF16 on
 
 The ONNX Runtime profiling data generated with the profiling option can be viewed in https://www.ui.perfetto.dev/, as described at https://onnxruntime.ai/docs/performance/tune-performance/profiling-tools.html.
 
-The following files correspond to the INT8 `resnet50_A8W8.onnx` model on each device:
-
-```text
-.\results\raw\cnn_smoke_test\onnxruntime_profile__resnet50_A8W8_CPU.json
-.\results\raw\cnn_smoke_test\onnxruntime_profile__resnet50_A8W8_NPU.json
-.\results\raw\cnn_smoke_test\onnxruntime_profile__resnet50_A8W8_igpu.json
-```
+Open the profile files correspond to the INT8 `resnet50_A8W8.onnx` model on each device, starts with `onnxruntime_profile__*.json`
 
 When you open these files, you will see one `session_initialization` event for session creation, 60 `model_run` events (10 warm-up runs and 50 measured runs), and detailed node-level information under each `model_run`.
 
@@ -186,11 +180,7 @@ For iGPU (DirectML), there is no visible QDQ overhead and model initialization t
 
 #### FP32 NPU Profile Analysis
 
-Now consider the NPU profiling data for the FP32 model:
-
-```text
-.\results\raw\cnn_smoke_test\onnxruntime_profile__resnet50_FP32_NPU.json
-```
+Now consider the NPU profiling data for the FP32 model. Open a profile file correspond to the FP32 `resnet50.onnx` model on NPU
 
 This file shows that model initialization is extremely long. This is because, once the FP32 model is detected, session initialization has to convert FP32 to BF16. This again highlights the importance of using the right data type for the target accelerator.
 

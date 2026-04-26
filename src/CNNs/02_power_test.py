@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-import csv
 import json
 import os
 import shutil
@@ -531,66 +530,6 @@ def try_parse_float(raw_value: str) -> float | None:
         return None
 
 
-def parse_csv_rows(path: Path) -> tuple[list[dict[str, str]], str]:
-    sample = path.read_text(encoding="utf-8-sig", errors="replace")
-    if not sample.strip():
-        return [], ","
-    try:
-        dialect = csv.Sniffer().sniff(sample[:4096], delimiters=",;\t")
-        delimiter = dialect.delimiter
-    except csv.Error:
-        delimiter = ","
-
-    with path.open("r", encoding="utf-8-sig", errors="replace", newline="") as handle:
-        reader = csv.DictReader(handle, delimiter=delimiter)
-        rows = [{key or "": value or "" for key, value in row.items()} for row in reader]
-    return rows, delimiter
-
-
-def select_numeric_columns(rows: list[dict[str, str]], hints: tuple[str, ...] | None = None) -> dict[str, list[float]]:
-    values_by_column: dict[str, list[float]] = {}
-    for row in rows:
-        for key, raw_value in row.items():
-            if not key:
-                continue
-            parsed = try_parse_float(raw_value)
-            if parsed is None:
-                continue
-            values_by_column.setdefault(key, []).append(parsed)
-
-    if not hints:
-        return values_by_column
-
-    preferred: dict[str, list[float]] = {}
-    for key, values in values_by_column.items():
-        normalized = key.lower()
-        if any(hint in normalized for hint in hints):
-            preferred[key] = values
-    if preferred:
-        return preferred
-    return values_by_column
-
-
-def summarize_csv_file(path: Path, hints: tuple[str, ...] | None = None) -> dict[str, Any]:
-    rows, delimiter = parse_csv_rows(path)
-    numeric_columns = select_numeric_columns(rows, hints=hints)
-    sorted_items = sorted(numeric_columns.items(), key=lambda item: item[0].lower())
-    summary: dict[str, Any] = {
-        "delimiter": delimiter,
-        "file": path_for_output(path),
-        "row_count": len(rows),
-        "numeric_column_count": len(sorted_items),
-    }
-    if rows:
-        header = [column for column in rows[0].keys() if column]
-        summary["header"] = header
-    if sorted_items:
-        summary["numeric_columns"] = {
-            key: summarize_numeric_series(values) for key, values in sorted_items[:20]
-        }
-    return summary
-
-
 def list_existing_paths(root: Path) -> set[Path]:
     if not root.exists():
         return set()
@@ -606,21 +545,16 @@ def list_new_paths(root: Path, before: set[Path]) -> list[Path]:
     )
 
 
-def collect_new_csv_summaries(
+def collect_new_artifact_files(
     root: Path,
     before: set[Path],
-    *,
-    hints: tuple[str, ...] | None = None,
-) -> tuple[list[dict[str, Any]], list[str]]:
+) -> list[str]:
     new_paths = list_new_paths(root, before)
-    csv_paths = [path for path in new_paths if path.is_file() and path.suffix.lower() == ".csv"]
-    summaries = [summarize_csv_file(path, hints=hints) for path in csv_paths]
-    artifacts = [
+    return [
         path_for_output(path)
         for path in new_paths
         if path.is_file()
     ]
-    return summaries, artifacts
 
 
 def ensure_tool_path(path: Path | None, label: str) -> Path:
@@ -684,26 +618,16 @@ def run_uprof(
     ]
     result = execute_command(workload_capture_command)
 
-    idle_csv_summaries, idle_artifact_files = collect_new_csv_summaries(
-        idle_root,
-        idle_before,
-        hints=("power",),
-    )
-    workload_csv_summaries, workload_artifact_files = collect_new_csv_summaries(
-        workload_root,
-        workload_before,
-        hints=("power",),
-    )
+    idle_artifact_files = collect_new_artifact_files(idle_root, idle_before)
+    workload_artifact_files = collect_new_artifact_files(workload_root, workload_before)
     telemetry_summary = {
         "event": config.uprof_event,
         "interval_ms": config.uprof_interval_ms,
         "idle": {
             "capture": summarize_process(idle_result),
-            "csv_summaries": idle_csv_summaries,
         },
         "workload": {
             "capture": summarize_process(result),
-            "csv_summaries": workload_csv_summaries,
         },
         "cooldown_seconds": config.cooldown_seconds,
         "preflight": summarize_process(preflight),
