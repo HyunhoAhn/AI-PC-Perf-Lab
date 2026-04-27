@@ -37,7 +37,7 @@ $runId = "cnn_smoke_test"
 python tools/capture_env.py --run-id $runId
 ```
 
-2. Capture benchmark execution with performance and power profiling.
+2. Capture benchmark execution with performance profiling.
 
 Manual run:
 
@@ -191,5 +191,3 @@ As shown above, model initialization on NPU takes a long time, and other profili
 ### Next Steps
 
 We observed that the iGPU outperformed the NPU in this smoke test. The next question is power consumption. We should analyze the power profiling data captured during this smoke test to determine whether there are meaningful differences in power usage across devices and model precisions. That will help us understand the energy-efficiency tradeoffs of running these models on different hardware.
-
-We should also review BF16-related results so that we can optimize NPU execution while preserving accuracy.
