@@ -16,9 +16,9 @@
 
 ## Repo structure
 - `docs/`: setup, methodology, benchmark plans, and profiling playbooks
-- `tools/`: CLI entry points for capture, parsing, and reporting
+- `tools/`: CLI entry points for capture, parsing, reporting, and automation scripts
 - `src/`: reusable logic for toolchain internals
-- `results/raw/`: immutable artifacts including environment capture, run commands, results, and configs
+- `results/raw/`: immutable artifacts including environment capture, run commands, results, and configs (Not uploaded to GitHub due to security/privacy concerns)
 - `images/`: documentation images
 
 ## Documentation Workstream
