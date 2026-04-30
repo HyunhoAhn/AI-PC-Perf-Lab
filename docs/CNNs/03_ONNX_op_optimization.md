@@ -21,7 +21,7 @@ The motivation is straightforward. In prior CPU runs, the quantized model did no
 
 ## How to Run
 
-### 1. Prepare the INT8 model
+### 1. Prepare the INT8 model & run the unoptimized baseline
 
 If the INT8 model has not already been generated, create it from the FP32 source model:
 
@@ -33,19 +33,21 @@ python -m quark.onnx.tools.random_quantize --input_model_path models/resnet50.on
 $runId = "onnx_op_optimization"
 python tools/capture_env.py --run-id $runId
 
-python tools/run_capture.py --run-id $runId -- python src/CNNs/01_cnn_smoke_test.py --model-path .\models\resnet50.onnx --device cpu --input-shape 3x224x224 --batch 1 --warmup 10 --repeat 50 -profile-out unoptimized_cpu_int8.json
-
+python tools/run_capture.py --run-id $runId -- python src/CNNs/01_cnn_smoke_test.py --model-path .\models\resnet50_A8W8.onnx --device cpu --input-shape 3x224x224 --batch 1 --warmup 10 --repeat 50 --profile-out results/raw/$runID/unoptimized_cpu_int8.json
 ```
 
 ### 2. Inspect the current graph structure
 
-Open the profile files correspond to the INT8 `resnet50_A8W8.onnx` model on each device, starts with `onnxruntime_profile__*.json`
+Open the profile files correspond to the INT8 `resnet50_A8W8.onnx` model on the CPU, specifically `unoptimized_cpu_int8.json`, using https://www.ui.perfetto.dev/. 
 
-using https://www.ui.perfetto.dev/. 
+Like we observed in the earlier smoke test, the graph is dominated by `QDQ`-style patterns and a large number of `Transpose` nodes. This suggests that the quantization workflow is not fully optimized for CPU execution, and there may be opportunities to consolidate operations and reduce overhead.
 
 
 ### 3 Depply analyze the quantization workflow
-Analyze AMD quark's quantization workflow 
+
+Let's analyze AMD Quark's quantization workflows. It is opensourced on GitHub at https://github.com/amd/Quark/tree/release/0.11. 
+
+Entry points of CLI leads to following workflows:
 
 ### 4. Apply graph optimizations
 
