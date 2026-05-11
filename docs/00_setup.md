@@ -18,10 +18,10 @@ This document records the machine-specific setup state, runtime versions, verifi
 ### 2. OS and Driver Versions
 
 - Windows version (build): Windows-11-10.0.26200-SP0
-- AMD chipset Software: 7.11.26.2142
-- AMD graphics driver: 32.0.23017.1001
+- AMD chipset Software: 7.11.26.2142 -> 8.02.18.557 (Updated at: 2026-05-10)
+- AMD graphics driver: 32.0.23017.1001 -> 32.0.31007.1017 (Upated at: 2026-05-10)
 - NPU driver / Ryzen AI Software version: 32.0.203.329/Ryzen AI 1.7.1 
-- Last verified date (UTC): 2026-04-04
+- Last verified date (UTC): 2026-05-10
 
 ### 3. Runtime and Tooling Versions
 
@@ -48,7 +48,7 @@ Settings
 - Add required environment paths
 - If Windows reserves NPU resources, disable **Windows AI Fabric service** as described in [Section 5](#5-issues-and-resolutions)
 - If custom ops are required, follow the `custom_ops.dll` notes in [Section 5](#5-issues-and-resolutions)
-
+- Change GPU/NPU/System dedicated/Shared memory allocation - check [LINK](https://www.amd.com/en/blogs/2025/faqs-amd-variable-graphics-memory-vram-ai-model-sizes-quantization-mcp-more.html)
 
 ### 5. Issues and Resolutions
 

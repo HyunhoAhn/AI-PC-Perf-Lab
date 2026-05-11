@@ -17,6 +17,7 @@ This folder contains CNN-specific test plans, observations, and precision notes.
 
 - `01_cnn_smoke_test.md`: End-to-end CNN smoke test procedure for ResNet50 across CPU, iGPU, and NPU, including model preparation, execution steps, and observed results.
 - `02_power_test.md`: power test procedure for comparing latency and software-visible power telemetry across CPU, iGPU, and NPU.
+- `03_ONNX_optimization.md`: ONNX optimization notes for CNN inference, including model export, graph rewriting considering the runtime low-level optimization.  
 
 ### `LLMs`
 
