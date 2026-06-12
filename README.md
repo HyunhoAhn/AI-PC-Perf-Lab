@@ -9,7 +9,7 @@
 1. Read `docs/00_setup.md` for environment setup and repo walkthrough.
 2. Read `docs/01_tools.md` to understand the tools for environment capture and command execution capture.
 3. Read `docs/CNNs` for CNN-specific documentation. It includes a smoke test with ResNet50 across different precisions and devices, along with performance and power profiling. It gives a great starting point for understanding the workflows before we move into LLMs.
-4. Run LLM reference benchmarks: WIP
+4. Read `docs/LLMs` for local LLM stack notes and early RAG smoke-test references, including the Lemonade Server + LangChain + Chroma `rag-langchain-ryzen` workflow.
 5. Run Agentic AI in AI PCs: WIP
 6. GPU kernel deep dive (optional): WIP
 

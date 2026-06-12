@@ -21,7 +21,10 @@ This folder contains CNN-specific test plans, observations, and precision notes.
 
 ### `LLMs`
 
-TBD. This folder is expected to contain LLM-specific smoke tests, profiling notes, and power or accuracy studies once that work is added to the repository.
+This folder contains LLM-specific concept notes, smoke tests, and future profiling or power studies.
+
+- `README.md`: High-level overview of how local LLM inference is structured on AI PCs, including model preparation, model formats, runtimes, backends, execution providers, and CPU/iGPU/NPU paths.
+- `01_rag_langchain_ryzen.md`: Notes for [HyunhoAhn/rag-langchain-ryzen](https://github.com/HyunhoAhn/rag-langchain-ryzen), a Lemonade Server + LangChain + Chroma local RAG verification project. It tests whether a Windows 11 Ryzen AI MAX machine can run an end-to-end local RAG flow through Lemonade's OpenAI-compatible API.
 
 ## How To Use This Folder
 
@@ -30,4 +33,4 @@ If you are starting a new test flow, read the documents in this order:
 1. `00_setup.md`
 2. `01_tools.md`
 3. `02_profiling_tools.md`
-4. The model-family folder you are working in, such as `CNNs`
+4. The model-family folder you are working in, such as `CNNs` or `LLMs`

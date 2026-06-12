@@ -17,7 +17,12 @@ model preparation
 
 This structure is important because an LLM does not automatically run on every accelerator in the system. Whether the model uses the CPU, integrated GPU, or NPU depends on the model format, runtime, backend, driver stack, and hardware support.
 
-In this repository, the `LLMs` folder is intended to contain LLM-specific notes, experiments, and future smoke tests. This document serves as the conceptual entry point for that work.
+In this repository, the `LLMs` folder is intended to contain LLM-specific notes, experiments, and smoke tests. This document serves as the conceptual entry point for that work.
+
+Current LLM documents:
+
+- `README.md`: Conceptual overview of the local LLM software stack on AI PCs.
+- `01_rag_langchain_ryzen.md`: Notes for [HyunhoAhn/rag-langchain-ryzen](https://github.com/HyunhoAhn/rag-langchain-ryzen), a Lemonade Server + LangChain + Chroma local RAG smoke test for a Windows 11 Ryzen AI MAX machine.
 
 ---
 
